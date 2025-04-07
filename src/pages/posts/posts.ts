@@ -16,6 +16,9 @@ import { PostServiceProvider } from '../../providers/post-service/post-service';
 })
 export class PostsPage {
 
+  searchText: string = '';
+  todosLosPosts: any[] = [];
+
   posts: any[] = [];
   constructor(
     public navCtrl: NavController,
@@ -31,11 +34,11 @@ export class PostsPage {
 
 
   cargarPosts(refresher?: Refresher) {
-
     if (!refresher) {
       const loader = this.loadingCtrl.create({ content: 'Cargando posts...' });
       loader.present();
       this.postService.getPosts().subscribe((data: any[]) => {
+        this.todosLosPosts = data;
         this.posts = data;
         loader.dismiss();
       }, err => {
@@ -44,11 +47,20 @@ export class PostsPage {
       });
     } else {
       this.postService.getPosts().subscribe((data: any[]) => {
+        this.todosLosPosts = data;
         this.posts = data;
         refresher.complete();
-      })
+      });
     }
-
   }
+
+  filtrarPosts() {
+    const texto = this.searchText.toLowerCase();
+    this.posts = this.todosLosPosts.filter(post =>
+      post.title.toLowerCase().includes(texto) ||
+      post.body.toLowerCase().includes(texto)
+    );
+  }
+
 
 }
